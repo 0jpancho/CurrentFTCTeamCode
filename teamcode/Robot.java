@@ -90,6 +90,7 @@ public class Robot {
 
         realTelemetry.addData("Current Function", "Initialize");
         realTelemetry.update();
+        l.idle();
     }
 
     public void resetDriveEncoders() throws InterruptedException {
@@ -100,13 +101,14 @@ public class Robot {
 
         l.idle();
 
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         realTelemetry.addData("Current Function", "Reset Drive Encoders");
         realTelemetry.update();
+        l.idle();
     }
 
     public double getAngle(int whichAngle) {
@@ -130,10 +132,10 @@ public class Robot {
         return getAngle(HEADING);
     }
 
-    public void resetGyro() {
+    /*public void resetGyro() {
         currentHeading = getAngle(1);
     }
-
+    */
     public void drive(float inches, int direction) throws InterruptedException {
         /*
         * Drive function that converts an input of inches into encoder
@@ -146,6 +148,7 @@ public class Robot {
 
         resetDriveEncoders();
         realTelemetry.addData("Current Function", "Start Drive");
+        l.idle();
 
         if (direction == DRIVE_FORWARD && l.opModeIsActive()) {
             frontLeft.setTargetPosition(newEncoderCounts);
@@ -155,6 +158,7 @@ public class Robot {
             backRight.setTargetPosition(-newEncoderCounts);
 
             realTelemetry.addData("Current Function", "Drive Forward");
+            l.idle();
         }
 
         else if (direction == DRIVE_BACKWARD && l.opModeIsActive()) {
@@ -165,6 +169,7 @@ public class Robot {
             backRight.setTargetPosition(newEncoderCounts);
 
             realTelemetry.addData("Current Function", "Drive Backward");
+            l.idle();
         }
 
         else if (direction == STRAFE_LEFT && l.opModeIsActive()) {
@@ -175,6 +180,7 @@ public class Robot {
             backRight.setTargetPosition(newEncoderCounts);
 
             realTelemetry.addData("Current Function", "Strafe Left");
+            l.idle();
         }
 
         else if (direction == STRAFE_RIGHT && l.opModeIsActive()) {
@@ -185,16 +191,24 @@ public class Robot {
             backRight.setTargetPosition(-newEncoderCounts);
 
             realTelemetry.addData("Current Function", "Strafe Right");
+            l.idle();
         }
 
         realTelemetry.addData("Current Function", "Drive Successful");
         realTelemetry.update();
+        l.idle();
     }
 
     // Function used to rotate to a specific angle in autonomous
     public void turnAngle(double angle, double power){
 
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         realTelemetry.addData("Current Function", "Start Turn Angle");
+        l.idle();
 
         //Rotate left
         while(getHeading() < angle && l.opModeIsActive()){
@@ -207,6 +221,7 @@ public class Robot {
             realTelemetry.addData("Current Heading", getHeading());
             realTelemetry.addData("Current Function", "Rotate Left");
             realTelemetry.update();
+            l.idle();
         }
 
         frontLeft.setPower(0);
@@ -226,6 +241,7 @@ public class Robot {
             realTelemetry.addData("Current Heading", getHeading());
             realTelemetry.addData("Current Function", "Rotate Right");
             realTelemetry.update();
+            l.idle();
         }
 
         frontLeft.setPower(0);
@@ -235,6 +251,7 @@ public class Robot {
         backRight.setPower(0);
 
         realTelemetry.update();
+        l.idle();
     }
 
     //Sets position of color servo in autonomous
@@ -250,6 +267,7 @@ public class Robot {
     public void moveOnColor(double power, int team, boolean ledEnable) throws InterruptedException{
 
         realTelemetry.addData("Current Function", "Start Move On Color");
+        l.idle();
 
         colorSensor.enableLed(ledEnable);
 
@@ -257,26 +275,32 @@ public class Robot {
         if (colorSensor.red() > colorSensor.blue() && team == RED && l.opModeIsActive()){
             drive(8, STRAFE_LEFT);
             realTelemetry.addData("Current Function", "Move on Color Strafe Left (RED)");
+            l.idle();
         }
         //If Red Alliance, red particle not detected, strafe right
         else if (colorSensor.red() < colorSensor.blue() && team == RED && l.opModeIsActive()){
             drive(8, STRAFE_RIGHT);
             realTelemetry.addData("Current Function", "Move on Color Strafe Right (RED)");
+            l.idle();
         }
         //If Blue Alliance, blue particle facing sensor, strafe opposite direction
         else if (colorSensor.blue() > colorSensor.red() && team == BLUE && l.opModeIsActive()){
             drive(8, STRAFE_LEFT);
             realTelemetry.addData("Current Function", "Move on Color Strafe Left (BLUE)");
+            l.idle();
         }
         //If Blue Alliance, blue particle not detected, strafe right
         else if (colorSensor.blue() < colorSensor.red() && team == BLUE && l.opModeIsActive()){
             drive(8, STRAFE_RIGHT);
             realTelemetry.addData("Current Function", "Move on Color Strafe Right (BLUE)");
+            l.idle();
         }
 
         colorSensor.enableLed(false);
         realTelemetry.addData("Current Function", "Move on Color Successful");
         realTelemetry.update();
+
+        l.idle();
     }
 
     public void testDrive(double power, double time){
@@ -291,6 +315,8 @@ public class Robot {
 
             realTelemetry.addData("Current Function", "Test Drive Successful");
             realTelemetry.update();
+
+            l.idle();
         }
     }
 }

@@ -14,9 +14,9 @@ public class TeleopMain extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight, lift;
     Servo topLiftLeft, bottomLiftLeft, topLiftRight, bottomLiftRight;
 
-    final double driveSpeed = 0.5;
-    final double turnSpeed = 0.25;
-    final double strafeSpeed = 0.25;
+    final double driveSpeed = 1;
+    final double turnSpeed = 0.5;
+    final double strafeSpeed = 1;
 
     final double liftSpeed = 0.5;
 
@@ -76,11 +76,11 @@ public class TeleopMain extends OpMode {
 
         /*strafe right*/
         else if (gamepad1.left_stick_x > 0.25) {
-            frontLeft.setPower(-turnSpeed);
-            frontRight.setPower(-turnSpeed);
+            frontLeft.setPower(-strafeSpeed);
+            frontRight.setPower(-strafeSpeed);
 
-            backLeft.setPower(turnSpeed);
-            backRight.setPower(turnSpeed);
+            backLeft.setPower(strafeSpeed);
+            backRight.setPower(strafeSpeed);
 
             telemetry.addData("Drive Direction", "Strafe Right");
         }
@@ -128,7 +128,7 @@ public class TeleopMain extends OpMode {
     else {
         lift.setPower(0);
     }
-
+    /*
     if (gamepad2.right_bumper  && servoState == false) {
 
         servoState = true;
@@ -155,7 +155,7 @@ public class TeleopMain extends OpMode {
     else if (!gamepad2.right_bumper) {
         servoState = false;
     }
-
+    */
     /*
     if (gamepad2.left_bumper) {
         topLiftLeft.setPosition(0.4);
@@ -172,10 +172,28 @@ public class TeleopMain extends OpMode {
         topLiftRight.setPosition(1);
         bottomLiftRight.setPosition(0);
     }
-
-
     */
 
+    //Left Side
+    if (gamepad2.left_bumper) {
+        topLiftLeft.setPosition(0);
+        bottomLiftLeft.setPosition(1);
+    }
+
+    else {
+        topLiftLeft.setPosition(0.4);
+        bottomLiftLeft.setPosition(0.6);
+    }
+
+    if (gamepad2.right_bumper) {
+        topLiftRight.setPosition(1);
+        bottomLiftRight.setPosition(0);
+    }
+
+    else {
+        topLiftRight.setPosition(0.6);
+        bottomLiftRight.setPosition(0.4);
+    }
     telemetry.addData("Servo State", servoState);
     telemetry.addData("Gamepad 2 Right Bumper", gamepad2.right_bumper);
 }}
