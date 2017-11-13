@@ -23,21 +23,26 @@ public class EncoderTest extends LinearOpMode {
         backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        frontLeft.setTargetPosition(2000);
-        backLeft.setTargetPosition(2000);
-
-        frontRight.setTargetPosition(-2000);
-        backRight.setTargetPosition(-2000);
-
         waitForStart();
 
-        while (getRuntime() >= 0 && getRuntime() >= 2 && opModeIsActive()) {
+
+
+        while (getRuntime() >= 0 && getRuntime() <= 10 && opModeIsActive()) {
+
+            frontLeft.setPower(1);
+            frontRight.setPower(1);
+
+            backLeft.setPower(1);
+            backRight.setPower(1);
 
             frontLeft.setTargetPosition(2000);
             backLeft.setTargetPosition(2000);
 
             frontRight.setTargetPosition(-2000);
             backRight.setTargetPosition(-2000);
+
+            telemetry.addData("Encoder Counts", frontLeft.getCurrentPosition());
+            telemetry.update();
         }
 
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
