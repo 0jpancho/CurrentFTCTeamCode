@@ -76,6 +76,8 @@ public class BlueTest extends LinearOpMode {
 
         headingOffset = getHeading();
 
+
+
         telemetry.addData("Current Function", "Initialize");
         telemetry.update();
         idle();

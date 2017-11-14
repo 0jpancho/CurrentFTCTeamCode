@@ -122,7 +122,7 @@ public class AutonTemplate extends LinearOpMode {
     }
 
     /*public void resetGyro() {
-        currentHeading = getAngle(1);
+        currentZero = getAngle(1);
     }
     */
     public void drive(float inches, int direction) throws InterruptedException {
