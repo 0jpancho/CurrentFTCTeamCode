@@ -164,6 +164,7 @@ public class Robot {
         resetDriveEncoders();
         realTelemetry.addData("Current Function", "Start Drive");
         l.idle();
+
         while (l.opModeIsActive()){
 
             frontLeft.setPower(0.25);
@@ -302,6 +303,7 @@ public class Robot {
     * using our drive functions. Drive directions are assuming
     * the color sensor is mounted facing right.
      */
+
     public void moveOnColor(double power, int team, boolean ledEnable) throws InterruptedException{
 
         realTelemetry.addData("Current Function", "Start Move On Color");
@@ -384,7 +386,6 @@ public class Robot {
                     realTelemetry.update();
 
                     break;
-
             }
         }
 
