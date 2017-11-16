@@ -30,7 +30,7 @@ public class Robot {
     float currentZero;
 
     final float wheelCircumference = (float) Math.PI * 4;
-    final float ppr = 1120;
+    final float ppr = 280;
 
     public final int DRIVE_FORWARD = 1;
     public final int DRIVE_BACKWARD = 2;
@@ -130,7 +130,7 @@ public class Robot {
         //Function used to get values from the Rev Hub's internal IMU
         switch (whichAngle) {
             case HEADING:
-                return angles.firstAngle = currentZero;
+                return angles.firstAngle;
 
             case ROLL:
                 return AngleUnit.DEGREES.normalize(angles.secondAngle);
@@ -144,18 +144,71 @@ public class Robot {
     }
 
     public float getHeading() {
-        return getAngle(HEADING) - currentZero;
+        return getAngle(HEADING);
     }
 
     public void resetHeading() {
         currentZero = getAngle(HEADING);
     }
 
-    public void drive(float inches, int direction) throws InterruptedException {
-        /*
-        * Drive function that converts an input of inches into encoder
-        * counts. Allows the motors to drive to a certain distance
-         */
+    public void driveForward(float inches) throws InterruptedException {
+
+        float numRevolutions = inches / wheelCircumference;
+
+        float encoderCounts = numRevolutions * ppr * 2;
+        int newEncoderCounts = (int) encoderCounts;
+
+        resetDriveEncoders();
+        realTelemetry.addData("Current Function", "Start Driving Forward");
+        l.idle();
+
+        while (l.opModeIsActive()) {
+
+            frontLeft.setPower(0.25);
+            frontRight.setPower(0.25);
+
+            backLeft.setPower(0.25);
+            backRight.setPower(0.25);
+
+            frontLeft.setTargetPosition(newEncoderCounts);
+            backLeft.setTargetPosition(newEncoderCounts);
+
+            frontRight.setTargetPosition(-newEncoderCounts);
+            backRight.setTargetPosition(-newEncoderCounts);
+
+            realTelemetry.addData("Current Function", "Drive Forward");
+            realTelemetry.update();
+            l.idle();
+        }
+    }
+
+    public void driveBackward (float inches) throws InterruptedException {
+
+        float numRevolutions = inches / wheelCircumference;
+
+        float encoderCounts = numRevolutions * ppr * 2;
+        int newEncoderCounts = (int) encoderCounts;
+
+        resetDriveEncoders();
+        realTelemetry.addData("Current Function", "Start Driving Forward");
+        l.idle();
+
+        while (l.opModeIsActive()) {
+
+            frontLeft.setTargetPosition(-newEncoderCounts);
+            backLeft.setTargetPosition(-newEncoderCounts);
+
+            frontRight.setTargetPosition(newEncoderCounts);
+            backRight.setTargetPosition(newEncoderCounts);
+
+            realTelemetry.addData("Current Function", "Drive Backward");
+            realTelemetry.update();
+            l.idle();
+        }
+    }
+
+    public void strafeLeft (float inches) throws InterruptedException {
+
         float numRevolutions = inches / wheelCircumference;
 
         float encoderCounts = numRevolutions * ppr * 2;
@@ -165,76 +218,42 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Drive");
         l.idle();
 
-        while (l.opModeIsActive()){
+        while (l.opModeIsActive()) {
 
-            frontLeft.setPower(0.25);
-            frontRight.setPower(0.25);
+            frontLeft.setTargetPosition(-newEncoderCounts);
+            backLeft.setTargetPosition(newEncoderCounts);
 
-            backLeft.setPower(0.25);
-            backRight.setPower(0.25);
+            frontRight.setTargetPosition(-newEncoderCounts);
+            backRight.setTargetPosition(newEncoderCounts);
 
-            switch(direction) {
-                case DRIVE_FORWARD:
-
-                    frontLeft.setTargetPosition(newEncoderCounts);
-                    backLeft.setTargetPosition(newEncoderCounts);
-
-                    frontRight.setTargetPosition(-newEncoderCounts);
-                    backRight.setTargetPosition(-newEncoderCounts);
-
-                    realTelemetry.addData("Current Function", "Drive Forward");
-                    realTelemetry.update();
-                    l.idle();
-
-                    break;
-
-                case DRIVE_BACKWARD:
-
-                    frontLeft.setTargetPosition(-newEncoderCounts);
-                    backLeft.setTargetPosition(-newEncoderCounts);
-
-                    frontRight.setTargetPosition(newEncoderCounts);
-                    backRight.setTargetPosition(newEncoderCounts);
-
-                    realTelemetry.addData("Current Function", "Drive Backward");
-                    realTelemetry.update();
-                    l.idle();
-
-                    break;
-
-                case STRAFE_LEFT:
-
-                    frontLeft.setTargetPosition(-newEncoderCounts);
-                    backLeft.setTargetPosition(newEncoderCounts);
-
-                    frontRight.setTargetPosition(-newEncoderCounts);
-                    backRight.setTargetPosition(newEncoderCounts);
-
-                    realTelemetry.addData("Current Function", "Strafe Left");
-                    realTelemetry.update();
-                    l.idle();
-
-                    break;
-
-                case STRAFE_RIGHT:
-
-                    frontLeft.setTargetPosition(newEncoderCounts);
-                    backLeft.setTargetPosition(-newEncoderCounts);
-
-                    frontRight.setTargetPosition(newEncoderCounts);
-                    backRight.setTargetPosition(-newEncoderCounts);
-
-                    realTelemetry.addData("Current Function", "Strafe Right");
-                    realTelemetry.update();
-                    l.idle();
-
-                    break;
-            }
-
-            realTelemetry.addData("Current Function", "Drive Successful");
+            realTelemetry.addData("Current Function", "Strafe Left");
             realTelemetry.update();
             l.idle();
+        }
+    }
 
+    public void strafeRight (float inches) throws InterruptedException {
+
+        float numRevolutions = inches / wheelCircumference;
+
+        float encoderCounts = numRevolutions * ppr * 2;
+        int newEncoderCounts = (int) encoderCounts;
+
+        resetDriveEncoders();
+        realTelemetry.addData("Current Function", "Start Drive");
+        l.idle();
+
+        while (l.opModeIsActive()) {
+
+            frontLeft.setTargetPosition(newEncoderCounts);
+            backLeft.setTargetPosition(-newEncoderCounts);
+
+            frontRight.setTargetPosition(newEncoderCounts);
+            backRight.setTargetPosition(-newEncoderCounts);
+
+            realTelemetry.addData("Current Function", "Strafe Right");
+            realTelemetry.update();
+            l.idle();
         }
     }
 
@@ -313,7 +332,7 @@ public class Robot {
 
         //If Red Alliance, red particle facing sensor, strafe opposite direction
         if (colorSensor.red() > colorSensor.blue() && team == RED && l.opModeIsActive()){
-            drive(8, STRAFE_LEFT);
+            strafeLeft(8);
             realTelemetry.addData("Current Function", "Move on Color Strafe Left (RED)");
             realTelemetry.update();
             l.idle();
@@ -321,7 +340,7 @@ public class Robot {
 
         //If Red Alliance, red particle not detected, strafe right
         else if (colorSensor.red() < colorSensor.blue() && team == RED && l.opModeIsActive()){
-            drive(8, STRAFE_RIGHT);
+            strafeRight(8);
             realTelemetry.addData("Current Function", "Move on Color Strafe Right (RED)");
             realTelemetry.update();
             l.idle();
@@ -329,7 +348,7 @@ public class Robot {
 
         //If Blue Alliance, blue particle facing sensor, strafe opposite direction
         else if (colorSensor.blue() > colorSensor.red() && team == BLUE && l.opModeIsActive()){
-            drive(8, STRAFE_LEFT);
+            strafeLeft(8);
             realTelemetry.addData("Current Function", "Move on Color Strafe Left (BLUE)");
             realTelemetry.update();
             l.idle();
@@ -337,7 +356,7 @@ public class Robot {
 
         //If Blue Alliance, blue particle not detected, strafe right
         else if (colorSensor.blue() < colorSensor.red() && team == BLUE && l.opModeIsActive()){
-            drive(8, STRAFE_RIGHT);
+            strafeRight(8);
             realTelemetry.addData("Current Function", "Move on Color Strafe Right (BLUE)");
             realTelemetry.update();
             l.idle();
