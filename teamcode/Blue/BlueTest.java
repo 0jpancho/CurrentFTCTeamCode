@@ -19,7 +19,12 @@ public class BlueTest extends LinearOpMode {
 
         waitForStart();
 
-        robot.drive(8, robot.DRIVE_FORWARD);
-        robot.drive(18, robot.DRIVE_BACKWARD);
+        robot.driveForward(12);
+        robot.driveBackward(12);
+        robot.strafeLeft(12);
+        robot.strafeRight(12);
+
+        robot.turnLeft(90);
+        robot.turnRight(180);
     }
 }

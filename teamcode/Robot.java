@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.kauailabs.navx.ftc.AHRS;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,9 +8,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 /**
@@ -23,9 +21,6 @@ public class Robot {
 
     public Servo colorArm;
     public ColorSensor colorSensor;
-
-    public BNO055IMU imu;
-    public Orientation angles;
 
     float currentZero;
 
@@ -53,6 +48,10 @@ public class Robot {
     public LinearOpMode l;
     Telemetry realTelemetry;
 
+    public AHRS navX;
+
+    private final int NAVX_DIM_I2C_PORT = 0;
+
     /*
     * Function that allows us to create multiple autonomous modes without
     * having to redeclare hardware maps or variables. Allows us to have
@@ -79,14 +78,9 @@ public class Robot {
         //colorArm = hardwareMap.servo.get("colorArm");
         //colorSensor = hardwareMap.colorSensor.get("colorSensor");
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+        navX = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
+                NAVX_DIM_I2C_PORT,
+                AHRS.DeviceDataType.kProcessedData);
 
         frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -100,8 +94,6 @@ public class Robot {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
 
         realTelemetry.addData("Current Function", "Initialize");
         realTelemetry.update();
@@ -126,29 +118,17 @@ public class Robot {
         l.idle();
     }
 
-    public float getAngle(int whichAngle) {
-        //Function used to get values from the Rev Hub's internal IMU
-        switch (whichAngle) {
-            case HEADING:
-                return angles.firstAngle;
+    public void setMotorsZero (){
 
-            case ROLL:
-                return AngleUnit.DEGREES.normalize(angles.secondAngle);
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
 
-            case PITCH:
-                return AngleUnit.DEGREES.normalize(angles.thirdAngle);
-
-            default:
-                return getAngle(HEADING);
-        }
+        frontRight.setPower(0);
+        backRight.setPower(0);
     }
 
-    public float getHeading() {
-        return getAngle(HEADING);
-    }
-
-    public void resetHeading() {
-        currentZero = getAngle(HEADING);
+    public void resetNavXYaw () {
+        navX.zeroYaw();
     }
 
     public void driveForward(float inches) throws InterruptedException {
@@ -180,6 +160,8 @@ public class Robot {
             realTelemetry.update();
             l.idle();
         }
+
+        setMotorsZero();
     }
 
     public void driveBackward (float inches) throws InterruptedException {
@@ -205,6 +187,8 @@ public class Robot {
             realTelemetry.update();
             l.idle();
         }
+
+        setMotorsZero();
     }
 
     public void strafeLeft (float inches) throws InterruptedException {
@@ -230,6 +214,8 @@ public class Robot {
             realTelemetry.update();
             l.idle();
         }
+
+        setMotorsZero();
     }
 
     public void strafeRight (float inches) throws InterruptedException {
@@ -255,61 +241,81 @@ public class Robot {
             realTelemetry.update();
             l.idle();
         }
+
+        setMotorsZero();
     }
 
     // Function used to rotate to a specific angle in autonomous
-    public void turnAngle(double angle, double power){
+    public void turnLeft (double degrees) {
 
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        realTelemetry.addData("Current Function", "Start Turn Angle");
-        l.idle();
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        //Rotate left
-        while(getHeading() < angle && l.opModeIsActive()){
-            frontLeft.setPower(-power);
+        realTelemetry.addData("Current Function", "Start Turning Left");
+        realTelemetry.update();
+
+        double power = 0.25;
+
+        resetNavXYaw();
+
+        while (Math.abs(navX.getYaw()) >= degrees && l.opModeIsActive()) {
+
+            frontLeft.setPower(power);
+            backLeft.setPower(power);
+
             frontRight.setPower(-power);
-
-            backLeft.setPower(-power);
             backRight.setPower(-power);
 
-            realTelemetry.addData("Current Heading", getHeading());
-            realTelemetry.addData("Current Function", "Rotate Left");
+            realTelemetry.addData("Current Function", "Turning Left");
+            realTelemetry.addData("Yaw", navX.getYaw());
             realTelemetry.update();
-            l.idle();
         }
 
-        frontLeft.setPower(0);
-        backLeft.setPower(0);
+        setMotorsZero();
+        resetNavXYaw();
 
-        frontRight.setPower(0);
-        backRight.setPower(0);
+        realTelemetry.addData("Current Function", "Finished Turning Left");
+        realTelemetry.update();
 
-        //Rotate right
-        while(getHeading() > angle && l.opModeIsActive()) {
-            frontLeft.setPower(power);
+    }
+
+    public void turnRight (double degrees) {
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        realTelemetry.addData("Current Function", "Start Turning Right");
+        realTelemetry.update();
+
+        double power = 0.25;
+
+        resetNavXYaw();
+
+        while (navX.getYaw() >= degrees && l.opModeIsActive()) {
+
+            frontLeft.setPower(-power);
+            backLeft.setPower(-power);
+
             frontRight.setPower(power);
-
-            backLeft.setPower(power);
             backRight.setPower(power);
 
-            realTelemetry.addData("Current Heading", getHeading());
-            realTelemetry.addData("Current Function", "Rotate Right");
+            realTelemetry.addData("Current Function", "Turning Right");
+            realTelemetry.addData("Yaw", navX.getYaw());
             realTelemetry.update();
-            l.idle();
         }
 
-        frontLeft.setPower(0);
-        backLeft.setPower(0);
+        setMotorsZero();
+        resetNavXYaw();
 
-        frontRight.setPower(0);
-        backRight.setPower(0);
-
+        realTelemetry.addData("Current Function", "Finished Turning Right");
         realTelemetry.update();
-        l.idle();
+
     }
 
     //Sets position of color servo in autonomous
