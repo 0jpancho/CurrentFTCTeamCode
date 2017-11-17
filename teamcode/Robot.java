@@ -21,7 +21,7 @@ public class Robot {
     public ColorSensor colorSensor;
 
     final float wheelCircumference = (float) Math.PI * 4;
-    final float ppr = 280;
+    final float ppr = 1120;
 
     public final int RED = 1;
     public final int BLUE = 2;
@@ -79,10 +79,12 @@ public class Robot {
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        /*
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        */
 
         realTelemetry.addData("Current Function", "Initialize");
         realTelemetry.update();
@@ -131,8 +133,8 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Driving Forward");
         l.idle();
 
-        while (l.opModeIsActive() && (frontLeft.getTargetPosition() <= newEncoderCounts - motorTolerance
-                || frontLeft.getTargetPosition() >= newEncoderCounts + motorTolerance)) {
+        while (l.opModeIsActive() && (frontLeft.getCurrentPosition() <= newEncoderCounts - motorTolerance
+                || frontLeft.getCurrentPosition() >= newEncoderCounts + motorTolerance)) {
 
             frontLeft.setPower(0.25);
             frontRight.setPower(0.25);
@@ -140,17 +142,16 @@ public class Robot {
             backLeft.setPower(0.25);
             backRight.setPower(0.25);
 
-            frontLeft.setTargetPosition(newEncoderCounts);
-            backLeft.setTargetPosition(newEncoderCounts);
+            frontLeft.setTargetPosition(-newEncoderCounts);
+            backLeft.setTargetPosition(-newEncoderCounts);
 
-            frontRight.setTargetPosition(-newEncoderCounts);
-            backRight.setTargetPosition(-newEncoderCounts);
+            frontRight.setTargetPosition(newEncoderCounts);
+            backRight.setTargetPosition(newEncoderCounts);
 
             realTelemetry.addData("Current Function", "Drive Forward");
             realTelemetry.update();
             l.idle();
         }
-        setMotorsZero();
     }
 
     public void driveBackward (float inches) throws InterruptedException {
@@ -164,20 +165,19 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Driving Forward");
         l.idle();
 
-        while (l.opModeIsActive() && (Math.abs(frontLeft.getTargetPosition()) <= newEncoderCounts - motorTolerance
-                || Math.abs(frontLeft.getTargetPosition()) >= newEncoderCounts + motorTolerance)) {
+        while (l.opModeIsActive() && (Math.abs(frontLeft.getCurrentPosition()) <= newEncoderCounts - motorTolerance
+                || Math.abs(frontLeft.getCurrentPosition()) >= newEncoderCounts + motorTolerance)) {
 
-            frontLeft.setTargetPosition(-newEncoderCounts);
-            backLeft.setTargetPosition(-newEncoderCounts);
+            frontLeft.setTargetPosition(newEncoderCounts);
+            backLeft.setTargetPosition(newEncoderCounts);
 
-            frontRight.setTargetPosition(newEncoderCounts);
-            backRight.setTargetPosition(newEncoderCounts);
+            frontRight.setTargetPosition(-newEncoderCounts);
+            backRight.setTargetPosition(-newEncoderCounts);
 
             realTelemetry.addData("Current Function", "Drive Backward");
             realTelemetry.update();
             l.idle();
         }
-
         setMotorsZero();
     }
 
@@ -192,8 +192,8 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Drive");
         l.idle();
 
-        while (l.opModeIsActive() && (Math.abs(frontLeft.getTargetPosition()) <= newEncoderCounts - motorTolerance
-                || Math.abs(frontLeft.getTargetPosition()) >= newEncoderCounts + motorTolerance)) {
+        while (l.opModeIsActive() && (Math.abs(frontLeft.getCurrentPosition()) <= newEncoderCounts - motorTolerance
+                || Math.abs(frontLeft.getCurrentPosition()) >= newEncoderCounts + motorTolerance)) {
 
             frontLeft.setTargetPosition(-newEncoderCounts);
             backLeft.setTargetPosition(newEncoderCounts);
@@ -220,8 +220,8 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Drive");
         l.idle();
 
-        while (l.opModeIsActive() && (frontLeft.getTargetPosition() <= newEncoderCounts - motorTolerance
-                || frontLeft.getTargetPosition() >= newEncoderCounts + motorTolerance)) {
+        while (l.opModeIsActive() && (frontLeft.getCurrentPosition() <= newEncoderCounts - motorTolerance
+                || frontLeft.getCurrentPosition() >= newEncoderCounts + motorTolerance)) {
 
             frontLeft.setTargetPosition(newEncoderCounts);
             backLeft.setTargetPosition(-newEncoderCounts);

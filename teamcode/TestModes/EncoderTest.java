@@ -29,11 +29,11 @@ public class EncoderTest extends LinearOpMode {
 
         while (getRuntime() >= 0 && getRuntime() <= 10 && opModeIsActive()) {
 
-            frontLeft.setPower(1);
-            frontRight.setPower(1);
+            frontLeft.setPower(0.25);
+            frontRight.setPower(0.25);
 
-            backLeft.setPower(1);
-            backRight.setPower(1);
+            backLeft.setPower(0.25);
+            backRight.setPower(0.25);
 
             frontLeft.setTargetPosition(2000);
             backLeft.setTargetPosition(2000);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.kauailabs.navx.ftc.AHRS;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,6 +14,9 @@ public class TeleopMain extends OpMode {
 
     DcMotor frontLeft, frontRight, backLeft, backRight, lift;
     Servo topLiftLeft, bottomLiftLeft, topLiftRight, bottomLiftRight;
+
+    AHRS navX;
+    private final int NAVX_DIM_I2C_PORT = 0;
 
     final double driveSpeed = 1;
     final double turnSpeed = 0.5;
@@ -29,6 +33,10 @@ public class TeleopMain extends OpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
 
+        navX = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
+                NAVX_DIM_I2C_PORT,
+                AHRS.DeviceDataType.kProcessedData);
+
         lift = hardwareMap.dcMotor.get("lift");
 
         topLiftLeft = hardwareMap.servo.get("topLiftLeft");
@@ -40,6 +48,8 @@ public class TeleopMain extends OpMode {
 
     @Override
     public void loop(){
+
+        telemetry.addData("Heading", navX.getYaw());
 
         /*forward*/
         if (gamepad1.left_stick_y < -0.25) {
@@ -196,4 +206,6 @@ public class TeleopMain extends OpMode {
     }
     telemetry.addData("Servo State", servoState);
     telemetry.addData("Gamepad 2 Right Bumper", gamepad2.right_bumper);
+
+        telemetry.update();
 }}
