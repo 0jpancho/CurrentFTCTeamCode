@@ -1,14 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.kauailabs.navx.ftc.AHRS;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 /**
  * Created by Joseph Pancho on 10/18/2017.
@@ -17,24 +15,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class Robot {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, lift;
-    Servo topLiftLeft, bottomLiftLeft, topLiftRight, bottomLiftRight;
+    public Servo topLiftLeft, bottomLiftLeft, topLiftRight, bottomLiftRight;
 
     public Servo colorArm;
     public ColorSensor colorSensor;
 
-    float currentZero;
-
     final float wheelCircumference = (float) Math.PI * 4;
     final float ppr = 280;
-
-    public final int DRIVE_FORWARD = 1;
-    public final int DRIVE_BACKWARD = 2;
-    public final int STRAFE_LEFT = 3;
-    public final int STRAFE_RIGHT = 4;
-
-    public final int HEADING = 1;
-    public final int ROLL = 2;
-    public final int PITCH = 3;
 
     public final int RED = 1;
     public final int BLUE = 2;
@@ -51,6 +38,8 @@ public class Robot {
     public AHRS navX;
 
     private final int NAVX_DIM_I2C_PORT = 0;
+
+    final int motorTolerance = 5;
 
     /*
     * Function that allows us to create multiple autonomous modes without
@@ -142,7 +131,8 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Driving Forward");
         l.idle();
 
-        while (l.opModeIsActive()) {
+        while (l.opModeIsActive() && (frontLeft.getTargetPosition() <= newEncoderCounts - motorTolerance
+                || frontLeft.getTargetPosition() >= newEncoderCounts + motorTolerance)) {
 
             frontLeft.setPower(0.25);
             frontRight.setPower(0.25);
@@ -160,7 +150,6 @@ public class Robot {
             realTelemetry.update();
             l.idle();
         }
-
         setMotorsZero();
     }
 
@@ -175,7 +164,8 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Driving Forward");
         l.idle();
 
-        while (l.opModeIsActive()) {
+        while (l.opModeIsActive() && (Math.abs(frontLeft.getTargetPosition()) <= newEncoderCounts - motorTolerance
+                || Math.abs(frontLeft.getTargetPosition()) >= newEncoderCounts + motorTolerance)) {
 
             frontLeft.setTargetPosition(-newEncoderCounts);
             backLeft.setTargetPosition(-newEncoderCounts);
@@ -202,7 +192,8 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Drive");
         l.idle();
 
-        while (l.opModeIsActive()) {
+        while (l.opModeIsActive() && (Math.abs(frontLeft.getTargetPosition()) <= newEncoderCounts - motorTolerance
+                || Math.abs(frontLeft.getTargetPosition()) >= newEncoderCounts + motorTolerance)) {
 
             frontLeft.setTargetPosition(-newEncoderCounts);
             backLeft.setTargetPosition(newEncoderCounts);
@@ -229,7 +220,8 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Drive");
         l.idle();
 
-        while (l.opModeIsActive()) {
+        while (l.opModeIsActive() && (frontLeft.getTargetPosition() <= newEncoderCounts - motorTolerance
+                || frontLeft.getTargetPosition() >= newEncoderCounts + motorTolerance)) {
 
             frontLeft.setTargetPosition(newEncoderCounts);
             backLeft.setTargetPosition(-newEncoderCounts);
@@ -297,7 +289,7 @@ public class Robot {
 
         resetNavXYaw();
 
-        while (navX.getYaw() >= degrees && l.opModeIsActive()) {
+        while (Math.abs(navX.getYaw()) >= degrees&& l.opModeIsActive()) {
 
             frontLeft.setPower(-power);
             backLeft.setPower(-power);
@@ -431,6 +423,8 @@ public class Robot {
 
                 case LIFT_LIFT:
 
+                    lift.setPower(0.25);
+
                     lift.setTargetPosition(3000);
 
                     realTelemetry.addData("Current Function", "Lift Lift");
@@ -439,6 +433,8 @@ public class Robot {
                     break;
 
                 case LOWER_LIFT:
+
+                    lift.setPower(0.25);
 
                     lift.setTargetPosition(0);
 
