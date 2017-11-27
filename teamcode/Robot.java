@@ -33,9 +33,11 @@ public class Robot {
     public final int LOWER_LIFT = 2;
 
     public LinearOpMode l;
-    Telemetry realTelemetry;
+    public Telemetry realTelemetry;
 
     public AHRS navX;
+
+    public final double autonDriveSpeed = 0.1;
 
     private final int NAVX_DIM_I2C_PORT = 0;
 
@@ -133,14 +135,13 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Driving Forward");
         l.idle();
 
-        while (l.opModeIsActive() && (frontLeft.getCurrentPosition() <= newEncoderCounts - motorTolerance
-                || frontLeft.getCurrentPosition() >= newEncoderCounts + motorTolerance)) {
+        while (l.opModeIsActive() && frontLeft.getCurrentPosition() <= newEncoderCounts) {
 
-            frontLeft.setPower(0.25);
-            frontRight.setPower(0.25);
+            frontLeft.setPower(autonDriveSpeed);
+            frontRight.setPower(autonDriveSpeed);
 
-            backLeft.setPower(0.25);
-            backRight.setPower(0.25);
+            backLeft.setPower(autonDriveSpeed);
+            backRight.setPower(autonDriveSpeed);
 
             frontLeft.setTargetPosition(-newEncoderCounts);
             backLeft.setTargetPosition(-newEncoderCounts);
@@ -165,8 +166,13 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Driving Forward");
         l.idle();
 
-        while (l.opModeIsActive() && (Math.abs(frontLeft.getCurrentPosition()) <= newEncoderCounts - motorTolerance
-                || Math.abs(frontLeft.getCurrentPosition()) >= newEncoderCounts + motorTolerance)) {
+        while (l.opModeIsActive() && frontLeft.getCurrentPosition() <= newEncoderCounts) {
+
+            frontLeft.setPower(autonDriveSpeed);
+            frontRight.setPower(autonDriveSpeed);
+
+            backLeft.setPower(-autonDriveSpeed);
+            backRight.setPower(-autonDriveSpeed);
 
             frontLeft.setTargetPosition(newEncoderCounts);
             backLeft.setTargetPosition(newEncoderCounts);
@@ -194,6 +200,12 @@ public class Robot {
 
         while (l.opModeIsActive() && (Math.abs(frontLeft.getCurrentPosition()) <= newEncoderCounts - motorTolerance
                 || Math.abs(frontLeft.getCurrentPosition()) >= newEncoderCounts + motorTolerance)) {
+
+            frontLeft.setPower(autonDriveSpeed);
+            frontRight.setPower(autonDriveSpeed);
+
+            backLeft.setPower(autonDriveSpeed);
+            backRight.setPower(autonDriveSpeed);
 
             frontLeft.setTargetPosition(-newEncoderCounts);
             backLeft.setTargetPosition(newEncoderCounts);
@@ -223,6 +235,12 @@ public class Robot {
         while (l.opModeIsActive() && (frontLeft.getCurrentPosition() <= newEncoderCounts - motorTolerance
                 || frontLeft.getCurrentPosition() >= newEncoderCounts + motorTolerance)) {
 
+            frontLeft.setPower(autonDriveSpeed);
+            frontRight.setPower(autonDriveSpeed);
+
+            backLeft.setPower(autonDriveSpeed);
+            backRight.setPower(autonDriveSpeed);
+
             frontLeft.setTargetPosition(newEncoderCounts);
             backLeft.setTargetPosition(-newEncoderCounts);
 
@@ -238,22 +256,23 @@ public class Robot {
     }
 
     // Function used to rotate to a specific angle in autonomous
-    public void turnLeft (double degrees) {
+    public void turnLeft (double degrees) throws InterruptedException {
 
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         realTelemetry.addData("Current Function", "Start Turning Left");
         realTelemetry.update();
 
-        double power = 0.25;
+        double power = 0.15;
+        double yaw  = navX.getYaw();
 
         resetNavXYaw();
 
-        while (Math.abs(navX.getYaw()) >= degrees && l.opModeIsActive()) {
+        while (Math.abs(yaw) >= degrees && l.opModeIsActive()) {
 
             frontLeft.setPower(power);
             backLeft.setPower(power);
@@ -268,28 +287,30 @@ public class Robot {
 
         setMotorsZero();
         resetNavXYaw();
+        resetDriveEncoders();
 
         realTelemetry.addData("Current Function", "Finished Turning Left");
         realTelemetry.update();
 
     }
 
-    public void turnRight (double degrees) {
+    public void turnRight (double degrees) throws InterruptedException {
 
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         realTelemetry.addData("Current Function", "Start Turning Right");
         realTelemetry.update();
 
-        double power = 0.25;
+        double power = 0.15;
+        double yaw  = navX.getYaw();
 
         resetNavXYaw();
 
-        while (Math.abs(navX.getYaw()) >= degrees&& l.opModeIsActive()) {
+        while (Math.abs(yaw) >= degrees&& l.opModeIsActive()) {
 
             frontLeft.setPower(-power);
             backLeft.setPower(-power);
@@ -304,6 +325,7 @@ public class Robot {
 
         setMotorsZero();
         resetNavXYaw();
+        resetDriveEncoders();
 
         realTelemetry.addData("Current Function", "Finished Turning Right");
         realTelemetry.update();

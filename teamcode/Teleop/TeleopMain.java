@@ -12,8 +12,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name = "Main Teleop", group = "Sctuff")
 public class TeleopMain extends OpMode {
 
-    DcMotor frontLeft, frontRight, backLeft, backRight, lift;
-    Servo topLiftLeft, bottomLiftLeft, topLiftRight, bottomLiftRight;
+    DcMotor frontLeft, frontRight, backLeft, backRight, lift, relic;
+    Servo topLiftLeft, bottomLiftLeft, topLiftRight, bottomLiftRight, relicLeft, relicRight;
 
     AHRS navX;
     private final int NAVX_DIM_I2C_PORT = 0;
@@ -44,6 +44,10 @@ public class TeleopMain extends OpMode {
 
         topLiftRight = hardwareMap.servo.get("topLiftRight");
         bottomLiftRight = hardwareMap.servo.get("bottomLiftRight");
+
+        relic = hardwareMap.dcMotor.get("relic");
+        relicLeft = hardwareMap.servo.get("relicLeft");
+        relicRight = hardwareMap.servo.get("relicRight");
     }
 
     @Override
@@ -138,6 +142,19 @@ public class TeleopMain extends OpMode {
     else {
         lift.setPower(0);
     }
+
+    if (gamepad2.left_stick_y < -0.25) {
+        relic.setPower(0.15);
+    }
+
+    else if (gamepad2.left_stick_y > 0.25) {
+        relic.setPower(-0.15);
+    }
+
+    else {
+        relic.setPower(0);
+    }
+
     /*
     if (gamepad2.right_bumper  && servoState == false) {
 
