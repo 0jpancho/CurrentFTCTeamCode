@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name = "Main Teleop", group = "Sctuff")
 public class TeleopMain extends OpMode {
 
-    DcMotor frontLeft, frontRight, backLeft, backRight, lift, relic;
+    DcMotor frontLeft, frontRight, backLeft, backRight, lift, relic, balStone;
     Servo topLiftLeft, bottomLiftLeft, topLiftRight, bottomLiftRight, relicLeft, relicRight;
 
     AHRS navX;
@@ -48,6 +48,8 @@ public class TeleopMain extends OpMode {
         relic = hardwareMap.dcMotor.get("relic");
         relicLeft = hardwareMap.servo.get("relicLeft");
         relicRight = hardwareMap.servo.get("relicRight");
+
+        balStone = hardwareMap.dcMotor.get("balStone");
     }
 
     @Override
@@ -130,12 +132,12 @@ public class TeleopMain extends OpMode {
 
             telemetry.addData("Drive Direction", "Stop Motors (Deadzone)");
         }
-
-    if (gamepad2.right_stick_y < -0.25){
+    //Controls the lift motor for the glyph manipulator
+    if (gamepad2.left_stick_y < -0.25){
         lift.setPower(-liftSpeed);
     }
 
-    else if (gamepad2.right_stick_y > 0.25) {
+    else if (gamepad2.left_stick_y > 0.25) {
         lift.setPower(liftSpeed);
     }
 
@@ -143,19 +145,58 @@ public class TeleopMain extends OpMode {
         lift.setPower(0);
     }
 
-    if (gamepad2.left_stick_y < -0.25) {
-        relic.setPower(0.15);
-    }
+    //Pinball control for glyph arms
 
-    else if (gamepad2.left_stick_y > 0.25) {
-        relic.setPower(-0.15);
+    //Left glyph arm control
+    if (gamepad2.left_bumper) {
+        topLiftLeft.setPosition(0);
+        bottomLiftLeft.setPosition(1);
     }
 
     else {
-        relic.setPower(0);
+        topLiftLeft.setPosition(0.4);
+        bottomLiftLeft.setPosition(0.6);
+    }
+
+    //Right glyph arm control
+    if (gamepad2.right_bumper) {
+        topLiftRight.setPosition(1);
+        bottomLiftRight.setPosition(0);
+    }
+
+    else {
+        topLiftRight.setPosition(0.6);
+        bottomLiftRight.setPosition(0.4);
     }
 
     /*
+    * After a a minute and thirty seconds, at end game, enable relic manipulator control.
+    * Makes sure that the operator only has control of this manipulator when needed.
+     */
+    if (getRuntime() > 90) {
+
+        if (gamepad2.right_stick_y < -0.25) {
+            relic.setPower(0.15);
+        }
+
+        else if (gamepad2.right_stick_y > 0.25) {
+            relic.setPower(-0.15);
+        }
+
+        else {
+            relic.setPower(0);
+        }
+
+        if (gamepad2.a) {
+            balStone.setPower(1);
+        }
+
+        else {
+            balStone.setPower(0);
+        }
+    }
+
+       /*
     if (gamepad2.right_bumper  && servoState == false) {
 
         servoState = true;
@@ -200,27 +241,6 @@ public class TeleopMain extends OpMode {
         bottomLiftRight.setPosition(0);
     }
     */
-
-    //Left Side
-    if (gamepad2.left_bumper) {
-        topLiftLeft.setPosition(0);
-        bottomLiftLeft.setPosition(1);
-    }
-
-    else {
-        topLiftLeft.setPosition(0.4);
-        bottomLiftLeft.setPosition(0.6);
-    }
-
-    if (gamepad2.right_bumper) {
-        topLiftRight.setPosition(1);
-        bottomLiftRight.setPosition(0);
-    }
-
-    else {
-        topLiftRight.setPosition(0.6);
-        bottomLiftRight.setPosition(0.4);
-    }
     telemetry.addData("Servo State", servoState);
     telemetry.addData("Gamepad 2 Right Bumper", gamepad2.right_bumper);
 

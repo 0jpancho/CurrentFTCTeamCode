@@ -153,6 +153,10 @@ public class Robot {
             realTelemetry.update();
             l.idle();
         }
+        setMotorsZero();
+
+        realTelemetry.addData("Current Function", "Drive Forward Finished");
+        realTelemetry.update();
     }
 
     public void driveBackward (float inches) throws InterruptedException {
@@ -163,7 +167,7 @@ public class Robot {
         int newEncoderCounts = (int) encoderCounts;
 
         resetDriveEncoders();
-        realTelemetry.addData("Current Function", "Start Driving Forward");
+        realTelemetry.addData("Current Function", "Start Driving Backward");
         l.idle();
 
         while (l.opModeIsActive() && frontLeft.getCurrentPosition() <= newEncoderCounts) {
@@ -185,6 +189,9 @@ public class Robot {
             l.idle();
         }
         setMotorsZero();
+
+        realTelemetry.addData("Current Function", "Drive Backward Finished");
+        realTelemetry.update();
     }
 
     public void strafeLeft (float inches) throws InterruptedException {
@@ -217,8 +224,10 @@ public class Robot {
             realTelemetry.update();
             l.idle();
         }
-
         setMotorsZero();
+
+        realTelemetry.addData("Current Function", "Strafe Left Finished");
+        realTelemetry.update();
     }
 
     public void strafeRight (float inches) throws InterruptedException {
@@ -251,8 +260,10 @@ public class Robot {
             realTelemetry.update();
             l.idle();
         }
-
         setMotorsZero();
+
+        realTelemetry.addData("Current Function", "Strafe Right Finished");
+        realTelemetry.update();
     }
 
     // Function used to rotate to a specific angle in autonomous
