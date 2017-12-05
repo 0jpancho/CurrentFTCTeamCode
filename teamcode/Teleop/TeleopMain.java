@@ -173,7 +173,7 @@ public class TeleopMain extends OpMode {
     * After a a minute and thirty seconds, at end game, enable relic manipulator control.
     * Makes sure that the operator only has control of this manipulator when needed.
      */
-    if (getRuntime() > 90) {
+    if (getRuntime() > 30) {
 
         if (gamepad2.right_stick_y < -0.25) {
             relic.setPower(0.15);
@@ -193,6 +193,15 @@ public class TeleopMain extends OpMode {
 
         else {
             balStone.setPower(0);
+        }
+
+        if (gamepad2.a) {
+            relicLeft.setPosition(1);
+            relicRight.setPosition(0);
+        }
+        else if (gamepad2.b) {
+            relicLeft.setPosition(0);
+            relicRight.setPosition(1);
         }
     }
 
@@ -241,8 +250,9 @@ public class TeleopMain extends OpMode {
         bottomLiftRight.setPosition(0);
     }
     */
-    telemetry.addData("Servo State", servoState);
-    telemetry.addData("Gamepad 2 Right Bumper", gamepad2.right_bumper);
-
+    telemetry.addData("Front Left Enc Counts", frontLeft.getCurrentPosition());
+        telemetry.addData("Front Right Enc Counts", frontRight.getCurrentPosition());
+        telemetry.addData("Back Left Enc Counts", backLeft.getCurrentPosition());
+        telemetry.addData("Back Right Enc Counts", backRight.getCurrentPosition());
         telemetry.update();
 }}

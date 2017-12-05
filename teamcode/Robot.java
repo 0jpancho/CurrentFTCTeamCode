@@ -149,6 +149,11 @@ public class Robot {
             frontRight.setTargetPosition(newEncoderCounts);
             backRight.setTargetPosition(newEncoderCounts);
 
+            l.telemetry.addData("Front Left Enc Counts", frontLeft.getCurrentPosition());
+            l.telemetry.addData("Front Right Enc Counts", frontRight.getCurrentPosition());
+            l.telemetry.addData("Back Left Enc Counts", backLeft.getCurrentPosition());
+            l.telemetry.addData("Back Right Enc Counts", backRight.getCurrentPosition());
+
             realTelemetry.addData("Current Function", "Drive Forward");
             realTelemetry.update();
             l.idle();
@@ -170,7 +175,7 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Driving Backward");
         l.idle();
 
-        while (l.opModeIsActive() && frontLeft.getCurrentPosition() <= newEncoderCounts) {
+        while (l.opModeIsActive() && frontLeft.getCurrentPosition() >= newEncoderCounts) {
 
             frontLeft.setPower(autonDriveSpeed);
             frontRight.setPower(autonDriveSpeed);
@@ -278,7 +283,7 @@ public class Robot {
         realTelemetry.addData("Current Function", "Start Turning Left");
         realTelemetry.update();
 
-        double power = 0.15;
+        double power = 0.35;
         double yaw  = navX.getYaw();
 
         resetNavXYaw();
@@ -294,6 +299,8 @@ public class Robot {
             realTelemetry.addData("Current Function", "Turning Left");
             realTelemetry.addData("Yaw", navX.getYaw());
             realTelemetry.update();
+
+            l.idle();
         }
 
         setMotorsZero();
@@ -332,6 +339,8 @@ public class Robot {
             realTelemetry.addData("Current Function", "Turning Right");
             realTelemetry.addData("Yaw", navX.getYaw());
             realTelemetry.update();
+
+            l.idle();
         }
 
         setMotorsZero();
