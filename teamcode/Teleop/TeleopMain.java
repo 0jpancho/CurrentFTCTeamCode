@@ -50,6 +50,8 @@ public class TeleopMain extends OpMode {
         relicRight = hardwareMap.servo.get("relicRight");
 
         balStone = hardwareMap.dcMotor.get("balStone");
+
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @Override
@@ -120,6 +122,16 @@ public class TeleopMain extends OpMode {
             backRight.setPower(turnSpeed);
 
             telemetry.addData("Drive Direction", "Rotate Left");
+        }
+        else if(gamepad1.y)
+        {
+            frontLeft.setPower(1);
+            backRight.setPower(-1);
+        }
+        else if(gamepad1.a)
+        {
+            frontLeft.setPower(-1);
+            backRight.setPower(1);
         }
         /*dead zone*/
         else if (gamepad1.left_stick_y < 0.25 && gamepad1.left_stick_y > -0.25 &&
@@ -203,6 +215,7 @@ public class TeleopMain extends OpMode {
             relicLeft.setPosition(0);
             relicRight.setPosition(1);
         }
+
     }
 
        /*
@@ -254,5 +267,6 @@ public class TeleopMain extends OpMode {
         telemetry.addData("Front Right Enc Counts", frontRight.getCurrentPosition());
         telemetry.addData("Back Left Enc Counts", backLeft.getCurrentPosition());
         telemetry.addData("Back Right Enc Counts", backRight.getCurrentPosition());
+        telemetry.addData("Lift Enc Counts", lift.getCurrentPosition());
         telemetry.update();
 }}
