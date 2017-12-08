@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.Blue;
 
+import com.kauailabs.navx.ftc.AHRS;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import java.util.Timer;
-
 /**
  * Created by Joseph Pancho on 12/6/2017.
  */
-
+@Autonomous(name = "Blue One", group = "Stuff")
 public class Blue_One extends LinearOpMode {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, lift;
@@ -28,6 +28,9 @@ public class Blue_One extends LinearOpMode {
 
     public final double autonDriveSpeed = 0.5;
 
+    public AHRS navX;
+    private final int NAVX_DIM_I2C_PORT = 0;
+
 
     public void runOpMode() {
 
@@ -44,12 +47,20 @@ public class Blue_One extends LinearOpMode {
         topLiftRight = hardwareMap.servo.get("topLiftRight");
         bottomLiftRight = hardwareMap.servo.get("bottomLiftRight");
 
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        navX = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
+                NAVX_DIM_I2C_PORT,
+                AHRS.DeviceDataType.kProcessedData);
+
         waitForStart();
 
         while (opModeIsActive() && getRuntime() >= 0 && getRuntime() <= 5) {
-            liftState(1500);
+            liftState(LEVEL_TWO);
             servoState(SERVOS_CLOSE);
-            drive(DRIVE_FORWARD, 10);
+            drive(DRIVE_FORWARD, 2);
+            turnLeft(-60);
+            turnRight(60);
         }
     }
     public void liftState(int state) {
@@ -86,7 +97,7 @@ public class Blue_One extends LinearOpMode {
 
         double startTime = getRuntime();
 
-        while (time < getRuntime() - startTime  && opModeIsActive()) {
+        while (time > getRuntime() - startTime  && opModeIsActive()) {
 
             if (direction == DRIVE_FORWARD) {
                 frontLeft.setPower(-autonDriveSpeed);
@@ -120,6 +131,39 @@ public class Blue_One extends LinearOpMode {
                 frontRight.setPower(autonDriveSpeed);
                 backRight.setPower(-autonDriveSpeed);
             }
+        }
+    }
+    public void turnLeft(double degrees) {
+
+        double power = 0.35;
+        double yaw  = navX.getYaw();
+
+        while (yaw >= degrees && opModeIsActive()) {
+
+            frontLeft.setPower(power);
+            backLeft.setPower(power);
+
+            frontRight.setPower(-power);
+            backRight.setPower(-power);
+
+            idle();
+        }
+    }
+
+    public void turnRight(double degrees) {
+
+        double power = 0.35;
+        double yaw  = navX.getYaw();
+
+        while (yaw <= degrees && opModeIsActive()) {
+
+            frontLeft.setPower(power);
+            backLeft.setPower(power);
+
+            frontRight.setPower(power);
+            backRight.setPower(power);
+
+            idle();
         }
     }
 }

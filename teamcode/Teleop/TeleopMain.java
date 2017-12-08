@@ -22,7 +22,7 @@ public class TeleopMain extends OpMode {
     final double turnSpeed = 0.5;
     final double strafeSpeed = 1;
 
-    final double liftSpeed = 0.5;
+    final double liftSpeed = 1;
 
     boolean servoState = false;
 
